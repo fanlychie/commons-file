@@ -12,7 +12,7 @@ import java.io.*;
 public final class FileUtils {
 
     // 默认字符集编码
-    private static final String DEFAULT_CHARSET = "GBK";
+    private static final String CHARSET_GBK = "GBK";
 
     // 私有
     private FileUtils() {
@@ -27,7 +27,7 @@ public final class FileUtils {
      */
     public static WritableStream write(File file) {
         try {
-            return new WritableStream(new FileInputStream(file), DEFAULT_CHARSET);
+            return new WritableStream(new FileInputStream(file), CHARSET_GBK);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -41,7 +41,7 @@ public final class FileUtils {
      */
     public static WritableStream write(InputStream inputStream) {
         try {
-            return new WritableStream(inputStream, DEFAULT_CHARSET);
+            return new WritableStream(inputStream, CHARSET_GBK);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
