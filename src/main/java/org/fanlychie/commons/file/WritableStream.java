@@ -1,7 +1,19 @@
 package org.fanlychie.commons.file;
 
+import org.fanlychie.commons.file.exception.RuntimeCastException;
+import org.fanlychie.commons.file.util.ReaderBuilder;
+
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * 可写的流
@@ -12,8 +24,20 @@ public class WritableStream {
 
     private Reader reader;
 
+    // 默认使用的字符集编码
+    public static final String CHARSET_GBK = "GBK";
+
     // 字符
     private static final char[] BUFFERB = new char[65535];
+
+    /**
+     * 创建一个可写的流对象
+     *
+     * @param str 文本内容, 将被写出的内容
+     */
+    public WritableStream(String str) {
+        this.reader = new StringReader(str);
+    }
 
     /**
      * 创建一个可写的流对象
@@ -27,12 +51,29 @@ public class WritableStream {
     /**
      * 创建一个可写的流对象
      *
+     * @param src 源文件对象, 将被写出的文件
+     */
+    public WritableStream(File src) {
+        this.reader = ReaderBuilder.buildFileReader(src);
+    }
+
+    /**
+     * 创建一个可写的流对象
+     *
+     * @param inputStream InputStream
+     */
+    public WritableStream(InputStream inputStream) {
+        this.reader = ReaderBuilder.buildInputStreamReader(inputStream, CHARSET_GBK);
+    }
+
+    /**
+     * 创建一个可写的流对象
+     *
      * @param inputStream InputStream
      * @param charset     字符集编码
-     * @throws UnsupportedEncodingException
      */
-    public WritableStream(InputStream inputStream, String charset) throws UnsupportedEncodingException {
-        this.reader = new InputStreamReader(inputStream, charset);
+    public WritableStream(InputStream inputStream, String charset) {
+        this.reader = ReaderBuilder.buildInputStreamReader(inputStream, charset);
     }
 
     /**
@@ -73,13 +114,13 @@ public class WritableStream {
                 bufferedWriter.write(BUFFERB, 0, read);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeCastException(e);
         } finally {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeCastException(e);
                 }
             }
             if (bufferedWriter != null) {
@@ -87,7 +128,7 @@ public class WritableStream {
                     bufferedWriter.flush();
                     bufferedWriter.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeCastException(e);
                 }
             }
         }
@@ -106,7 +147,7 @@ public class WritableStream {
             response.setHeader("Content-Disposition", "attachment; filename=" + filename);
             toOutputStream(os);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeCastException(e);
         }
     }
 
@@ -120,7 +161,7 @@ public class WritableStream {
         try (OutputStream os = new FileOutputStream(dest, append)) {
             toOutputStream(os);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeCastException(e);
         }
     }
 
