@@ -107,7 +107,7 @@ public class Base64ImageEncoder {
                 if (faultToleranceMode) {
                     dataUriScheme = DATA_URI_SCHEME.get("jpg");
                 } else {
-                    throw new Base64EncodeImageException("不支持编码的图片类型: " + extension);
+                    throw new Base64EncodeImageException("不支持 Base64 编码的图片类型: " + extension);
                 }
             }
             return dataUriScheme + data;
