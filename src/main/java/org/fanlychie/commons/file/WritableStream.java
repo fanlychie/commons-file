@@ -16,7 +16,6 @@ import java.io.OutputStreamWriter;
 
 /**
  * 可写的流
- *
  * Created by fanlychie on 2017/1/10.
  */
 public class WritableStream {
@@ -26,7 +25,7 @@ public class WritableStream {
     private BufferedInputStream bufferedInputStream;
 
     // 512KB
-    private static final byte[] BUFFER = new byte[512 * 1028];
+    private static final byte[] BUFFER = new byte[512 * 1024];
 
     /**
      * 创建一个可写的流对象
@@ -104,15 +103,10 @@ public class WritableStream {
             } catch (IOException e) {
                 throw new RuntimeCastException(e);
             }
-            return ;
+            return;
         }
-        BufferedOutputStream bufferedOutputStream = null;
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
         try {
-            if (outputStream instanceof BufferedOutputStream) {
-                bufferedOutputStream = (BufferedOutputStream) outputStream;
-            } else {
-                bufferedOutputStream = new BufferedOutputStream(outputStream);
-            }
             int read;
             while ((read = bufferedInputStream.read(BUFFER)) != -1) {
                 bufferedOutputStream.write(BUFFER, 0, read);

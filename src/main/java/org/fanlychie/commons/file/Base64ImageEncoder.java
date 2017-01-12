@@ -1,0 +1,134 @@
+package org.fanlychie.commons.file;
+
+import org.fanlychie.commons.file.exception.Base64EncodeImageException;
+import org.fanlychie.commons.file.exception.RuntimeCastException;
+import org.fanlychie.commons.file.util.FileUtils;
+import org.fanlychie.commons.file.util.InputStreamBuilder;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Base64 图片编码器
+ * Created by fanlychie on 2017/1/12.
+ */
+public class Base64ImageEncoder {
+
+    private String extension;
+
+    private boolean faultToleranceMode;
+
+    private BufferedInputStream bufferedInputStream;
+
+    // 512KB
+    private static final byte[] BUFFER = new byte[512 * 1024];
+
+    private static final Map<String, String> DATA_URI_SCHEME = new HashMap<>();
+
+    static {
+        DATA_URI_SCHEME.put("gif", "data:image/gif;base64,");
+        DATA_URI_SCHEME.put("png", "data:image/png;base64,");
+        DATA_URI_SCHEME.put("ico", "data:image/x-icon;base64,");
+        DATA_URI_SCHEME.put("jpg", "data:image/jpeg;base64,");
+        DATA_URI_SCHEME.put("jpeg", "data:image/jpeg;base64,");
+    }
+
+    /**
+     * 创建一个 Base64 图片编码器对象
+     *
+     * @param imgFile 图片文件
+     */
+    public Base64ImageEncoder(File imgFile) {
+        this.extension = FileUtils.getFileExtension(imgFile.getName());
+        this.bufferedInputStream = InputStreamBuilder.buildBufferedInputStream(imgFile);
+    }
+
+    /**
+     * 创建一个 Base64 图片编码器对象
+     *
+     * @param imgUrl 图片地址
+     */
+    public Base64ImageEncoder(String imgUrl) {
+        this.faultToleranceMode = true;
+        this.extension = FileUtils.getUrlFileExtension(imgUrl);
+        this.bufferedInputStream = new BufferedInputStream(InputStreamBuilder.buildHpptUrlInputStream(imgUrl));
+    }
+
+    /**
+     * 创建一个 Base64 图片编码器对象
+     *
+     * @param inputStream InputStream
+     * @param extension   图片扩展名, eg: 'jpg', 'png'...
+     */
+    public Base64ImageEncoder(InputStream inputStream, String extension) {
+        this.extension = extension;
+        this.bufferedInputStream = new BufferedInputStream(inputStream);
+    }
+
+    /**
+     * 设置图片扩展名
+     *
+     * @param extension 图片扩展名, eg: 'jpg', 'png'...
+     * @return
+     */
+    public Base64ImageEncoder setExtension(String extension) {
+        this.extension = extension;
+        return this;
+    }
+
+    /**
+     * 设置容错模式
+     *
+     * @param faultToleranceMode 若为 true, 当提取不到扩展名时使用 'jpg' 作为图片文件的扩展名
+     * @return
+     */
+    public Base64ImageEncoder setFaultToleranceMode(boolean faultToleranceMode) {
+        this.faultToleranceMode = faultToleranceMode;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            int read;
+            while ((read = bufferedInputStream.read(BUFFER)) != -1) {
+                byteArrayOutputStream.write(BUFFER, 0, read);
+            }
+            String data = new String(Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()));
+            String dataUriScheme = DATA_URI_SCHEME.get(extension);
+            if (dataUriScheme == null) {
+                if (faultToleranceMode) {
+                    dataUriScheme = DATA_URI_SCHEME.get("jpg");
+                } else {
+                    throw new Base64EncodeImageException("不支持编码的图片类型: " + extension);
+                }
+            }
+            return dataUriScheme + data;
+        } catch (IOException e) {
+            throw new RuntimeCastException(e);
+        } finally {
+            if (bufferedInputStream != null) {
+                try {
+                    bufferedInputStream.close();
+                } catch (IOException e) {
+                    throw new RuntimeCastException(e);
+                }
+            }
+            if (byteArrayOutputStream != null) {
+                try {
+                    byteArrayOutputStream.close();
+                } catch (IOException e) {
+                    throw new RuntimeCastException(e);
+                }
+            }
+        }
+    }
+
+}

@@ -1,5 +1,6 @@
 package org.fanlychie.commons.file.util;
 
+import org.fanlychie.commons.file.Base64ImageEncoder;
 import org.fanlychie.commons.file.HttpURLStream;
 import org.fanlychie.commons.file.ReadableStream;
 import org.fanlychie.commons.file.WritableStream;
@@ -20,7 +21,7 @@ public final class FileUtils {
     }
 
     /**
-     * 构造一个可写的流对象
+     * 写出文件
      *
      * @param file 文件对象
      * @return 返回一个可写的流对象
@@ -30,7 +31,7 @@ public final class FileUtils {
     }
 
     /**
-     * 构造一个可写的流对象
+     * 写出文件
      *
      * @param fileName 文件绝对路径的名称
      * @return 返回一个可写的流对象
@@ -40,7 +41,7 @@ public final class FileUtils {
     }
 
     /**
-     * 构造一个可写的流对象
+     * 写出字符串
      *
      * @param str 字符串内容
      * @return 返回一个可写的流对象
@@ -50,7 +51,7 @@ public final class FileUtils {
     }
 
     /**
-     * 构造一个可写的流对象
+     * 写出输入流
      *
      * @param inputStream 输入流对象
      * @return 返回一个可写的流对象
@@ -133,14 +134,85 @@ public final class FileUtils {
     }
 
     /**
+     * Base64 编码图片文件
+     *
+     * @param imgFile 图片文件
+     * @return 返回编码的字符串
+     */
+    public static Base64ImageEncoder base64EncodeImageFile(File imgFile) {
+        return new Base64ImageEncoder(imgFile);
+    }
+
+    /**
+     * Base64 编码图片文件
+     *
+     * @param imgFileName 图片文件的绝对路径名称
+     * @return 返回编码的字符串
+     */
+    public static Base64ImageEncoder base64EncodeImageFile(String imgFileName) {
+        return new Base64ImageEncoder(new File(imgFileName));
+    }
+
+    /**
+     * Base64 编码 URL 链接的图片
+     *
+     * @param imgUrl URL 链接的图片地址
+     * @return 返回编码的字符串
+     */
+    public static Base64ImageEncoder base64EncodeImageUrl(String imgUrl) {
+        return new Base64ImageEncoder(imgUrl);
+    }
+
+    /**
+     * Base64 编码图片输入流
+     *
+     * @param inputStream InputStream
+     * @param extension   图片文件的扩展名
+     * @return 返回编码的字符串
+     */
+    public static Base64ImageEncoder base64EncodeImageStream(InputStream inputStream, String extension) {
+        return new Base64ImageEncoder(inputStream, extension);
+    }
+
+    /**
      * 获取文件扩展名
      *
      * @param fileName 文件名
      * @return 返回文件扩展名, eg: 'jpg', 'png'
      */
     public static String getFileExtension(String fileName) {
+        if (fileName == null) {
+            throw new NullPointerException();
+        }
         int index = fileName.lastIndexOf(".");
         return index == -1 ? "" : fileName.substring(index + 1).toLowerCase();
+    }
+
+    /**
+     * 获取 URL 链接地址的文件名称
+     *
+     * @param url URL 链接地址
+     * @return 返回提取到的文件名称
+     */
+    public static String getUrlFileName(String url) {
+        if (url == null) {
+            throw new NullPointerException();
+        }
+        int index = url.lastIndexOf("/");
+        if (index == -1) {
+            throw new IllegalArgumentException("无法提取 URL 链接地址的文件名称: " + url);
+        }
+        return url.substring(index + 1);
+    }
+
+    /**
+     * 获取 URL 链接地址的文件扩展名
+     *
+     * @param url URL 链接地址
+     * @return 返回文件扩展名, eg: 'jpg', 'png'
+     */
+    public static String getUrlFileExtension(String url) {
+        return getFileExtension(getUrlFileName(url));
     }
 
 }

@@ -1,16 +1,12 @@
 package org.fanlychie.commons.file;
 
-import org.fanlychie.commons.file.exception.RuntimeCastException;
 import org.fanlychie.commons.file.util.FileUtils;
+import org.fanlychie.commons.file.util.InputStreamBuilder;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * Http URL 流
- * <p>
  * Created by fanlychie on 2017/1/12.
  */
 public class HttpURLStream {
@@ -47,15 +43,7 @@ public class HttpURLStream {
      * @param dest 目录
      */
     public void toFolder(File dest) {
-        String fileName = null;
-        int index = url.lastIndexOf("/");
-        if (index != -1) {
-            fileName = url.substring(index + 1);
-        }
-        if (fileName == null) {
-            throw new IllegalArgumentException(url + " 无法截取有效的文件名称");
-        }
-        toFolder(dest, fileName);
+        toFolder(dest, FileUtils.getUrlFileName(url));
     }
 
     /**
@@ -96,21 +84,7 @@ public class HttpURLStream {
      * @param dest 文件
      */
     public void toFile(File dest) {
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-        } catch (IOException e) {
-            throw new RuntimeCastException(e);
-        }
-        conn.setReadTimeout(readTimeout);
-        conn.setConnectTimeout(connectTimeout);
-        conn.setRequestProperty("User-Agent",
-                "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36 SE 2.X MetaSr 1.0");
-        try {
-            FileUtils.writeStream(conn.getInputStream()).toFile(dest);
-        } catch (IOException e) {
-            throw new RuntimeCastException(e);
-        }
+        FileUtils.writeStream(InputStreamBuilder.buildHpptUrlInputStream(url, readTimeout, connectTimeout)).toFile(dest);
     }
 
     /**
