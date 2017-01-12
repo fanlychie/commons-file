@@ -142,13 +142,13 @@ public class WritableStream {
      * 写出到响应, 以供客户端浏览器下载
      *
      * @param response HttpServletResponse
-     * @param filename 客户端下载文件的名称
+     * @param fileName 客户端下载文件的名称
      */
-    public void toResponse(HttpServletResponse response, String filename) {
+    public void toDownload(HttpServletResponse response, String fileName) {
         try {
-            filename = new String(filename.getBytes("UTF-8"), "ISO-8859-1");
+            fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
             response.setContentType("application/octet-stream; charset=iso-8859-1");
-            response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             toOutputStream(response.getOutputStream());
         } catch (IOException e) {
             throw new RuntimeCastException(e);
