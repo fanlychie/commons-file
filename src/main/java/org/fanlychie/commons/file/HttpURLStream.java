@@ -35,6 +35,15 @@ public class HttpURLStream {
     /**
      * 下载到目录
      *
+     * @param dest 目录绝对路径的名称
+     */
+    public void toFolder(String dest) {
+        toFolder(new File(dest));
+    }
+
+    /**
+     * 下载到目录
+     *
      * @param dest 目录
      */
     public void toFolder(File dest) {
@@ -52,6 +61,16 @@ public class HttpURLStream {
     /**
      * 下载到目录
      *
+     * @param dest     目录绝对路径的名称
+     * @param fileName 文件名称
+     */
+    public void toFolder(String dest, String fileName) {
+        toFolder(new File(dest), fileName);
+    }
+
+    /**
+     * 下载到目录
+     *
      * @param dest     目录
      * @param fileName 文件名称
      */
@@ -60,6 +79,15 @@ public class HttpURLStream {
             throw new IllegalArgumentException(dest + " 不是一个有效的目录");
         }
         toFile(new File(dest, fileName));
+    }
+
+    /**
+     * 下载到文件
+     *
+     * @param dest 文件绝对路径的名称
+     */
+    public void toFile(String dest) {
+        toFile(new File(dest));
     }
 
     /**
