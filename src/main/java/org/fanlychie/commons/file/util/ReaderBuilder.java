@@ -15,7 +15,7 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Reader 构建器
- *
+ * <p>
  * Created by fanlychie on 2017/1/11.
  */
 public final class ReaderBuilder {
@@ -37,7 +37,7 @@ public final class ReaderBuilder {
     /**
      * 构建 FileReader 对象
      *
-     * @param fileName 文件名称
+     * @param fileName 文件绝对路径的名称
      * @return 返回 FileReader 对象
      */
     public static FileReader buildFileReader(String fileName) {
@@ -65,7 +65,7 @@ public final class ReaderBuilder {
     /**
      * 构建 BufferedReader 对象
      *
-     * @param fileName 文件名称
+     * @param fileName 文件绝对路径的名称
      * @return 返回 BufferedReader 对象
      */
     public static BufferedReader buildBufferedReader(String fileName) {
@@ -135,6 +135,35 @@ public final class ReaderBuilder {
     public static InputStreamReader buildInputStreamReader(File file, String charset) {
         try {
             return new InputStreamReader(new FileInputStream(file), charset);
+        } catch (IOException e) {
+            throw new RuntimeCastException(e);
+        }
+    }
+
+    /**
+     * 构建 InputStreamReader 对象
+     *
+     * @param fileName 文件绝对路径的名称
+     * @return 返回 InputStreamReader 对象
+     */
+    public static InputStreamReader buildInputStreamReader(String fileName) {
+        try {
+            return new InputStreamReader(new FileInputStream(fileName));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeCastException(e);
+        }
+    }
+
+    /**
+     * 构建 InputStreamReader 对象
+     *
+     * @param fileName 文件绝对路径的名称
+     * @param charset  字符集编码
+     * @return 返回 InputStreamReader 对象
+     */
+    public static InputStreamReader buildInputStreamReader(String fileName, String charset) {
+        try {
+            return new InputStreamReader(new FileInputStream(fileName), charset);
         } catch (IOException e) {
             throw new RuntimeCastException(e);
         }

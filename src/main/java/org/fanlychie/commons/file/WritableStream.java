@@ -1,19 +1,18 @@
 package org.fanlychie.commons.file;
 
 import org.fanlychie.commons.file.exception.RuntimeCastException;
-import org.fanlychie.commons.file.util.ReaderBuilder;
+import org.fanlychie.commons.file.util.InputStreamBuilder;
+import org.fanlychie.commons.file.util.OutputStreamBuilder;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringReader;
 
 /**
  * 可写的流
@@ -22,39 +21,29 @@ import java.io.StringReader;
  */
 public class WritableStream {
 
-    private Reader reader;
+    private String content;
 
-    // 默认使用的字符集编码
-    public static final String CHARSET_GBK = "GBK";
+    private BufferedInputStream bufferedInputStream;
 
-    // 字符
-    private static final char[] BUFFERB = new char[65535];
+    // 512KB
+    private static final byte[] BUFFER = new byte[512 * 1028];
 
     /**
      * 创建一个可写的流对象
      *
-     * @param str 文本内容, 将被写出的内容
+     * @param str 字符串内容
      */
     public WritableStream(String str) {
-        this.reader = new StringReader(str);
+        this.content = str;
     }
 
     /**
      * 创建一个可写的流对象
      *
-     * @param reader Reader
-     */
-    public WritableStream(Reader reader) {
-        this.reader = reader;
-    }
-
-    /**
-     * 创建一个可写的流对象
-     *
-     * @param src 源文件对象, 将被写出的文件
+     * @param src 源文件对象
      */
     public WritableStream(File src) {
-        this.reader = ReaderBuilder.buildFileReader(src);
+        this.bufferedInputStream = InputStreamBuilder.buildBufferedInputStream(src);
     }
 
     /**
@@ -63,17 +52,7 @@ public class WritableStream {
      * @param inputStream InputStream
      */
     public WritableStream(InputStream inputStream) {
-        this.reader = ReaderBuilder.buildInputStreamReader(inputStream, CHARSET_GBK);
-    }
-
-    /**
-     * 创建一个可写的流对象
-     *
-     * @param inputStream InputStream
-     * @param charset     字符集编码
-     */
-    public WritableStream(InputStream inputStream, String charset) {
-        this.reader = ReaderBuilder.buildInputStreamReader(inputStream, charset);
+        this.bufferedInputStream = InputStreamBuilder.buildBufferedInputStream(inputStream);
     }
 
     /**
@@ -82,7 +61,16 @@ public class WritableStream {
      * @param dest 目标文件
      */
     public void toFile(File dest) {
-        toFile(dest, false);
+        toOutputStream(OutputStreamBuilder.buildFileOutputStream(dest));
+    }
+
+    /**
+     * 写出到目标文件
+     *
+     * @param fileName 文件绝对路径的名称
+     */
+    public void toFile(String fileName) {
+        toOutputStream(OutputStreamBuilder.buildFileOutputStream(fileName));
     }
 
     /**
@@ -91,7 +79,16 @@ public class WritableStream {
      * @param dest 目标文件
      */
     public void toAppendFile(File dest) {
-        toFile(dest, true);
+        toOutputStream(OutputStreamBuilder.buildFileOutputStream(dest, true));
+    }
+
+    /**
+     * 追加到目标文件
+     *
+     * @param fileName 文件绝对路径的名称
+     */
+    public void toAppendFile(String fileName) {
+        toOutputStream(OutputStreamBuilder.buildFileOutputStream(fileName, true));
     }
 
     /**
@@ -100,33 +97,40 @@ public class WritableStream {
      * @param outputStream OutputStream
      */
     public void toOutputStream(OutputStream outputStream) {
-        BufferedReader bufferedReader = null;
-        BufferedWriter bufferedWriter = null;
+        if (content != null && bufferedInputStream == null) {
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+                bufferedWriter.write(content);
+                bufferedWriter.flush();
+            } catch (IOException e) {
+                throw new RuntimeCastException(e);
+            }
+            return ;
+        }
+        BufferedOutputStream bufferedOutputStream = null;
         try {
-            if (reader instanceof BufferedReader) {
-                bufferedReader = (BufferedReader) reader;
+            if (outputStream instanceof BufferedOutputStream) {
+                bufferedOutputStream = (BufferedOutputStream) outputStream;
             } else {
-                bufferedReader = new BufferedReader(reader);
+                bufferedOutputStream = new BufferedOutputStream(outputStream);
             }
             int read;
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-            while ((read = bufferedReader.read(BUFFERB)) != -1) {
-                bufferedWriter.write(BUFFERB, 0, read);
+            while ((read = bufferedInputStream.read(BUFFER)) != -1) {
+                bufferedOutputStream.write(BUFFER, 0, read);
             }
         } catch (IOException e) {
             throw new RuntimeCastException(e);
         } finally {
-            if (bufferedReader != null) {
+            if (bufferedInputStream != null) {
                 try {
-                    bufferedReader.close();
+                    bufferedInputStream.close();
                 } catch (IOException e) {
                     throw new RuntimeCastException(e);
                 }
             }
-            if (bufferedWriter != null) {
+            if (bufferedOutputStream != null) {
                 try {
-                    bufferedWriter.flush();
-                    bufferedWriter.close();
+                    bufferedOutputStream.flush();
+                    bufferedOutputStream.close();
                 } catch (IOException e) {
                     throw new RuntimeCastException(e);
                 }
@@ -141,25 +145,11 @@ public class WritableStream {
      * @param filename 客户端下载文件的名称
      */
     public void toResponse(HttpServletResponse response, String filename) {
-        try (OutputStream os = response.getOutputStream()) {
+        try {
             filename = new String(filename.getBytes("UTF-8"), "ISO-8859-1");
             response.setContentType("application/octet-stream; charset=iso-8859-1");
             response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-            toOutputStream(os);
-        } catch (IOException e) {
-            throw new RuntimeCastException(e);
-        }
-    }
-
-    /**
-     * 写出到目标文件
-     *
-     * @param dest   目标文件
-     * @param append true : 追加到文件末尾, false : 覆盖原文件
-     */
-    private void toFile(File dest, boolean append) {
-        try (OutputStream os = new FileOutputStream(dest, append)) {
-            toOutputStream(os);
+            toOutputStream(response.getOutputStream());
         } catch (IOException e) {
             throw new RuntimeCastException(e);
         }

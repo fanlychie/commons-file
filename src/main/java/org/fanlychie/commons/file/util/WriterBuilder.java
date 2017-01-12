@@ -12,7 +12,7 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Writer 构建器
- *
+ * <p>
  * Created by fanlychie on 2017/1/11.
  */
 public final class WriterBuilder {
@@ -49,7 +49,7 @@ public final class WriterBuilder {
     /**
      * 构建 FileWriter 对象
      *
-     * @param fileName 文件名称
+     * @param fileName 文件绝对路径的名称
      * @return 返回 FileWriter 对象
      */
     public static FileWriter buildFileWriter(String fileName) {
@@ -63,7 +63,7 @@ public final class WriterBuilder {
     /**
      * 构建 FileWriter 对象
      *
-     * @param fileName 文件名称
+     * @param fileName 文件绝对路径的名称
      * @param append   是否追加到文件, true: 追加, false: 覆盖
      * @return 返回 FileWriter 对象
      */
@@ -107,7 +107,7 @@ public final class WriterBuilder {
     /**
      * 构建 BufferedWriter 对象
      *
-     * @param fileName 文件名称
+     * @param fileName 文件绝对路径的名称
      * @return 返回 BufferedWriter 对象
      */
     public static BufferedWriter buildBufferedWriter(String fileName) {
@@ -121,7 +121,7 @@ public final class WriterBuilder {
     /**
      * 构建 BufferedWriter 对象
      *
-     * @param fileName 文件名称
+     * @param fileName 文件绝对路径的名称
      * @param append   是否追加到文件, true: 追加, false: 覆盖
      * @return 返回 BufferedWriter 对象
      */

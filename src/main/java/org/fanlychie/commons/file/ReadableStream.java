@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 /**
  * 可读的流
- *
+ * <p>
  * Created by fanlychie on 2017/1/11.
  */
 public class ReadableStream {
@@ -43,11 +43,30 @@ public class ReadableStream {
     /**
      * 创建一个可读的流对象
      *
+     * @param fileName 文件绝对路径的名称
+     */
+    public ReadableStream(String fileName) {
+        this.reader = ReaderBuilder.buildInputStreamReader(fileName, CHARSET_UTF8);
+    }
+
+    /**
+     * 创建一个可读的流对象
+     *
      * @param file    文件对象
      * @param charset 字符集编码
      */
     public ReadableStream(File file, String charset) {
         this.reader = ReaderBuilder.buildInputStreamReader(file, charset);
+    }
+
+    /**
+     * 创建一个可读的流对象
+     *
+     * @param fileName 文件绝对路径的名称
+     * @param charset  字符集编码
+     */
+    public ReadableStream(String fileName, String charset) {
+        this.reader = ReaderBuilder.buildInputStreamReader(fileName, charset);
     }
 
     /**
