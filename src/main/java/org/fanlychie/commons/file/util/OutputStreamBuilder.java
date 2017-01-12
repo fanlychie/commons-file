@@ -10,7 +10,6 @@ import java.io.OutputStream;
 
 /**
  * OutputStream 构建器
- * <p>
  * Created by fanlychie on 2017/1/12.
  */
 public final class OutputStreamBuilder {

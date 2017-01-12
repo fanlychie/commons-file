@@ -15,7 +15,6 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Reader 构建器
- * <p>
  * Created by fanlychie on 2017/1/11.
  */
 public final class ReaderBuilder {

@@ -13,7 +13,6 @@ import java.net.URL;
 
 /**
  * InputStream 构建器
- * <p>
  * Created by fanlychie on 2017/1/12.
  */
 public final class InputStreamBuilder {
