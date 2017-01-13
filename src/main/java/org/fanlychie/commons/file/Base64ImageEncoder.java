@@ -26,6 +26,8 @@ public class Base64ImageEncoder {
 
     private BufferedInputStream bufferedInputStream;
 
+    private static final String DEFAULT_EXTENSION = "jpg";
+
     // 512KB
     private static final byte[] BUFFER = new byte[512 * 1024];
 
@@ -55,7 +57,6 @@ public class Base64ImageEncoder {
      * @param imgUrl 图片地址
      */
     public Base64ImageEncoder(String imgUrl) {
-        this.faultToleranceMode = true;
         this.extension = FileUtils.getUrlFileExtension(imgUrl);
         this.bufferedInputStream = new BufferedInputStream(InputStreamBuilder.buildHpptUrlInputStream(imgUrl));
     }
@@ -102,10 +103,10 @@ public class Base64ImageEncoder {
                 byteArrayOutputStream.write(BUFFER, 0, read);
             }
             String data = new String(Base64.getEncoder().encode(byteArrayOutputStream.toByteArray()));
-            String dataUriScheme = DATA_URI_SCHEME.get(extension);
+            String dataUriScheme = DATA_URI_SCHEME.get(extension.toLowerCase());
             if (dataUriScheme == null) {
                 if (faultToleranceMode) {
-                    dataUriScheme = DATA_URI_SCHEME.get("jpg");
+                    dataUriScheme = DATA_URI_SCHEME.get(DEFAULT_EXTENSION);
                 } else {
                     throw new Base64EncodeImageException("不支持 Base64 编码的图片类型: " + extension);
                 }
