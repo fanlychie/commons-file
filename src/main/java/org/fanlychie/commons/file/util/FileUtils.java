@@ -1,5 +1,6 @@
 package org.fanlychie.commons.file.util;
 
+import org.fanlychie.commons.file.Base64ImageDecoder;
 import org.fanlychie.commons.file.Base64ImageEncoder;
 import org.fanlychie.commons.file.HttpURLStream;
 import org.fanlychie.commons.file.ReadableStream;
@@ -10,7 +11,6 @@ import java.io.InputStream;
 
 /**
  * 文件操作工具类
- * <p>
  * Created by fanlychie on 2017/1/10.
  */
 public final class FileUtils {
@@ -46,7 +46,7 @@ public final class FileUtils {
      * @param str 字符串内容
      * @return 返回一个可写的流对象
      */
-    public static WritableStream writeString(String str) {
+    public static WritableStream writeStr(String str) {
         return new WritableStream(str);
     }
 
@@ -172,6 +172,16 @@ public final class FileUtils {
      */
     public static Base64ImageEncoder base64EncodeImageStream(InputStream inputStream, String extension) {
         return new Base64ImageEncoder(inputStream, extension);
+    }
+
+    /**
+     * Base64 解码图片字符串
+     *
+     * @param imgBase64Str Base64 编码的字符串内容
+     * @return 返回 Base64 图片解码器
+     */
+    public static Base64ImageDecoder base64DecodeImageStr(String imgBase64Str) {
+        return new Base64ImageDecoder(imgBase64Str);
     }
 
     /**
