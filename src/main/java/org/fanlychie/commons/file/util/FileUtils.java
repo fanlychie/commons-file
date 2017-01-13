@@ -6,10 +6,12 @@ import org.fanlychie.commons.file.HttpURLStream;
 import org.fanlychie.commons.file.LocalFile;
 import org.fanlychie.commons.file.LocalFileUpload;
 import org.fanlychie.commons.file.ReadableStream;
+import org.fanlychie.commons.file.ServletFileUpload;
 import org.fanlychie.commons.file.SpringMVCFileUpload;
 import org.fanlychie.commons.file.WritableStream;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.InputStream;
 import java.util.UUID;
@@ -193,7 +195,7 @@ public final class FileUtils {
     }
 
     /**
-     * 本地文件上传
+     * Spring MVC 文件上传
      *
      * @param file 文件对象
      * @return 返回 SpringMVC 文件上传对象
@@ -203,13 +205,23 @@ public final class FileUtils {
     }
 
     /**
-     * 本地文件上传
+     * Spring MVC 文件上传
      *
      * @param files 文件对象数组
      * @return 返回 SpringMVC 文件上传对象
      */
     public static SpringMVCFileUpload uploadLocalFile(MultipartFile[] files) {
         return new SpringMVCFileUpload(files);
+    }
+
+    /**
+     * Servlet 文件上传
+     *
+     * @param request HttpServletRequest
+     * @return 返回 Servlet 文件上传对象
+     */
+    public static ServletFileUpload uploadLocalFile(HttpServletRequest request) {
+        return new ServletFileUpload(request);
     }
 
     /**
