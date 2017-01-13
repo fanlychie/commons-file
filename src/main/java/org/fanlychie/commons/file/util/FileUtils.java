@@ -3,17 +3,25 @@ package org.fanlychie.commons.file.util;
 import org.fanlychie.commons.file.Base64ImageDecoder;
 import org.fanlychie.commons.file.Base64ImageEncoder;
 import org.fanlychie.commons.file.HttpURLStream;
+import org.fanlychie.commons.file.LocalFile;
+import org.fanlychie.commons.file.LocalFileUpload;
 import org.fanlychie.commons.file.ReadableStream;
+import org.fanlychie.commons.file.SpringMVCFileUpload;
 import org.fanlychie.commons.file.WritableStream;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.UUID;
 
 /**
  * 文件操作工具类
  * Created by fanlychie on 2017/1/10.
  */
 public final class FileUtils {
+
+    // 文件大小单位
+    private static final String[] FILE_SIZE_UNIT = {"B", "KB", "M", "G"};
 
     // 私有
     private FileUtils() {
@@ -139,7 +147,7 @@ public final class FileUtils {
      * @param imgFile 图片文件
      * @return 返回编码的字符串
      */
-    public static Base64ImageEncoder base64EncodeImageFile(File imgFile) {
+    public static Base64ImageEncoder encodeImageFileBase64(File imgFile) {
         return new Base64ImageEncoder(imgFile);
     }
 
@@ -149,7 +157,7 @@ public final class FileUtils {
      * @param imgFileName 图片文件的绝对路径名称
      * @return 返回编码的字符串
      */
-    public static Base64ImageEncoder base64EncodeImageFile(String imgFileName) {
+    public static Base64ImageEncoder encodeImageFileBase64(String imgFileName) {
         return new Base64ImageEncoder(new File(imgFileName));
     }
 
@@ -159,7 +167,7 @@ public final class FileUtils {
      * @param imgUrl URL 链接的图片地址
      * @return 返回编码的字符串
      */
-    public static Base64ImageEncoder base64EncodeImageUrl(String imgUrl) {
+    public static Base64ImageEncoder encodeImageUrlBase64(String imgUrl) {
         return new Base64ImageEncoder(imgUrl);
     }
 
@@ -170,7 +178,7 @@ public final class FileUtils {
      * @param extension   图片文件的扩展名
      * @return 返回编码的字符串
      */
-    public static Base64ImageEncoder base64EncodeImageStream(InputStream inputStream, String extension) {
+    public static Base64ImageEncoder encodeImageStreamBase64(InputStream inputStream, String extension) {
         return new Base64ImageEncoder(inputStream, extension);
     }
 
@@ -180,8 +188,71 @@ public final class FileUtils {
      * @param imgBase64Str Base64 编码的字符串内容
      * @return 返回 Base64 图片解码器
      */
-    public static Base64ImageDecoder base64DecodeImageStr(String imgBase64Str) {
+    public static Base64ImageDecoder decodeImageStrBase64(String imgBase64Str) {
         return new Base64ImageDecoder(imgBase64Str);
+    }
+
+    /**
+     * 本地文件上传
+     *
+     * @param file 文件对象
+     * @return 返回 SpringMVC 文件上传对象
+     */
+    public static SpringMVCFileUpload uploadLocalFile(MultipartFile file) {
+        return new SpringMVCFileUpload(new MultipartFile[]{file});
+    }
+
+    /**
+     * 本地文件上传
+     *
+     * @param files 文件对象数组
+     * @return 返回 SpringMVC 文件上传对象
+     */
+    public static SpringMVCFileUpload uploadLocalFile(MultipartFile[] files) {
+        return new SpringMVCFileUpload(files);
+    }
+
+    /**
+     * 创建本地文件
+     *
+     * @param extension 文件扩展名, eg: 'jpg', 'png'...
+     * @return 返回本地文件对象
+     */
+    public static LocalFile createLocalFile(String extension) {
+        if (extension == null) {
+            extension = "";
+        } else {
+            extension = "." + extension;
+        }
+        String uuidStr = UUID.randomUUID().toString().replace("-", "");
+        String fileName = uuidStr + extension;
+        String childFolderName = fileName.substring(0, LocalFileUpload.getChildFolderLength());
+        File childFoloder = new File(LocalFileUpload.getStorageRootFolder() + "/" + childFolderName);
+        if (!childFoloder.exists()) {
+            childFoloder.mkdirs();
+        }
+        return new LocalFile(uuidStr, new File(childFoloder, fileName));
+    }
+
+    /**
+     * 获取本地文件
+     *
+     * @param fileKey 文件存储 KEY
+     * @return 返回 KEY 表示的本地文件
+     */
+    public static File getLocalFile(String fileKey) {
+        if (fileKey != null && fileKey.length() > LocalFileUpload.getChildFolderLength()) {
+            String childFolderName = fileKey.substring(0, LocalFileUpload.getChildFolderLength());
+            File childFoloder = new File(LocalFileUpload.getStorageRootFolder() + "/" + childFolderName);
+            if (childFoloder.isDirectory()) {
+                for (File file : childFoloder.listFiles()) {
+                    if (file.getName().equals(fileKey)) {
+                        return file;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -223,6 +294,21 @@ public final class FileUtils {
      */
     public static String getUrlFileExtension(String url) {
         return getFileExtension(getUrlFileName(url));
+    }
+
+    /**
+     * 获取表示文件大小的单位信息
+     *
+     * @param size 文件大小, 单位(B)
+     * @return 返回换算后的大小单位, eg: "2M" or "2KB" ...
+     */
+    public static String getFileSize(long size) {
+        int index = 0;
+        while (size / 1024 > 0 && index < FILE_SIZE_UNIT.length) {
+            size = Math.round(size / 1024);
+            index++;
+        }
+        return size + FILE_SIZE_UNIT[index];
     }
 
 }
