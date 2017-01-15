@@ -20,19 +20,40 @@ import java.util.Map;
  */
 public class Base64ImageEncoder {
 
+    /**
+     * 图片扩展名
+     */
     private String extension;
 
+    /**
+     * 容错模式, 默认关闭.
+     * 若开启此模式, 当得不到图片扩展名时, 则使用默认的图片扩展名.
+     */
     private boolean faultToleranceMode;
 
+    /**
+     * 图片资源输入流
+     */
     private BufferedInputStream bufferedInputStream;
 
+    /**
+     * 默认使用的图片扩展名
+     */
     private static final String DEFAULT_EXTENSION = "jpg";
 
-    // 512KB
+    /**
+     * IO 缓存, 512KB
+     */
     private static final byte[] BUFFER = new byte[512 * 1024];
 
+    /**
+     * 图片的 Data URI Scheme 对照表
+     */
     private static final Map<String, String> DATA_URI_SCHEME = new HashMap<>();
 
+    /**
+     * 初始化数据
+     */
     static {
         DATA_URI_SCHEME.put("gif", "data:image/gif;base64,");
         DATA_URI_SCHEME.put("png", "data:image/png;base64,");
