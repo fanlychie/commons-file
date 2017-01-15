@@ -11,12 +11,19 @@ import java.io.File;
  */
 public class HttpURLStream {
 
+    /**
+     * 超链接地址
+     */
     private String url;
 
-    // 3分钟
+    /**
+     * 读取超时时间, 默认3分钟
+     */
     private int readTimeout = 3 * 60 * 1000;
 
-    // 30秒
+    /**
+     * 连接超时时间, 默认30秒
+     */
     private int connectTimeout = 30 * 1000;
 
     /**
