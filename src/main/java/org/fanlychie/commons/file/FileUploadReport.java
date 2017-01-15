@@ -5,16 +5,28 @@ import java.util.List;
 
 /**
  * 文件上传报告
- * Created by 范忠云 on 2017/1/13.
+ * Created by fanlychie on 2017/1/13.
  */
 public class FileUploadReport {
 
+    /**
+     * 文件上传失败的个数
+     */
     private int failNum;
 
+    /**
+     * 文件上传成功的个数
+     */
     private int successNum;
 
+    /**
+     * 此容器用于存储上传成功的本地文件 Key 列表
+     */
     private List<String> fileKeys = new ArrayList<>();
 
+    /**
+     * 此容器用于存储文件上传失败的信息
+     */
     private List<String> failMsgs = new ArrayList<>();
 
     /**
