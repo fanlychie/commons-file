@@ -20,10 +20,19 @@ import java.util.regex.Pattern;
  */
 public class Base64ImageDecoder {
 
+    /**
+     * Base64 编码的字符串内容
+     */
     private String imgBase64Str;
 
+    /**
+     * 图片的 Data URI Scheme 对照表
+     */
     private static final Map<String, String> DATA_URI_SCHEME = new HashMap<>();
 
+    /**
+     * 初始化数据
+     */
     static {
         DATA_URI_SCHEME.put("data:image/gif;base64,", ".gif");
         DATA_URI_SCHEME.put("data:image/png;base64,", ".png");
