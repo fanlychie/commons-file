@@ -308,4 +308,24 @@ public final class FileUtils {
         return size + FILE_SIZE_UNIT[index];
     }
 
+    /**
+     * 获取类路径(classpath)下的文件
+     *
+     * @param pathname 文件相对于类路径下的路径名, 如: "com/path/file.pdf"
+     * @return 返回 classpath 目录下由 pathname 指定的路径的文件对象
+     */
+    public static File getClassPathFile(String pathname) {
+        return new File(Thread.currentThread().getContextClassLoader().getResource("").getPath() + pathname);
+    }
+
+    /**
+     * 获取类路径(classpath)下的文件输入流
+     *
+     * @param pathname 文件相对于类路径下的路径名, 如: "com/path/file.pdf"
+     * @return 返回 classpath 目录下由 pathname 指定的路径的文件输入流对象
+     */
+    public static InputStream getClassPathFileStream(String pathname) {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(pathname);
+    }
+
 }
