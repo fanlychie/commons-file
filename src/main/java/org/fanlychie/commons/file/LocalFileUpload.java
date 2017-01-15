@@ -6,9 +6,15 @@ package org.fanlychie.commons.file;
  */
 public class LocalFileUpload {
 
-    private static int childFolderLength = 5;
+    /**
+     * 本地上传的文件存储的子目录长度
+     */
+    static int childFolderLength = 5;
 
-    private static String storageRootFolder = System.getProperty("java.io.tmpdir");
+    /**
+     * 本地上传的文件存储根目录
+     */
+    static String storageRootFolder = System.getProperty("java.io.tmpdir");
 
     /**
      * 设置本地上传的文件存储根目录
@@ -26,24 +32,6 @@ public class LocalFileUpload {
      */
     public void setChildFolderLength(int childFolderLength) {
         LocalFileUpload.childFolderLength = childFolderLength;
-    }
-
-    /**
-     * 获取本地上传的文件存储根目录
-     *
-     * @return 返回本地上传的文件存储根目录
-     */
-    public static String getStorageRootFolder() {
-        return storageRootFolder;
-    }
-
-    /**
-     * 获取本地上传的文件存储的子目录长度
-     *
-     * @return 返回本地上传的文件存储的子目录长度
-     */
-    public static int getChildFolderLength() {
-        return childFolderLength;
     }
 
 }
