@@ -4,7 +4,6 @@ import org.fanlychie.commons.file.Base64ImageDecoder;
 import org.fanlychie.commons.file.Base64ImageEncoder;
 import org.fanlychie.commons.file.HttpURLStream;
 import org.fanlychie.commons.file.LocalFile;
-import org.fanlychie.commons.file.LocalFileUpload;
 import org.fanlychie.commons.file.ReadableStream;
 import org.fanlychie.commons.file.ServletFileUpload;
 import org.fanlychie.commons.file.SpringMVCFileUpload;
@@ -14,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.InputStream;
-import java.util.UUID;
 
 /**
  * 文件操作工具类
@@ -200,7 +198,7 @@ public final class FileUtils {
      * @param file 文件对象
      * @return 返回 SpringMVC 文件上传对象
      */
-    public static SpringMVCFileUpload uploadLocalFile(MultipartFile file) {
+    public static SpringMVCFileUpload uploadFile(MultipartFile file) {
         return new SpringMVCFileUpload(new MultipartFile[]{file});
     }
 
@@ -210,7 +208,7 @@ public final class FileUtils {
      * @param files 文件对象数组
      * @return 返回 SpringMVC 文件上传对象
      */
-    public static SpringMVCFileUpload uploadLocalFile(MultipartFile[] files) {
+    public static SpringMVCFileUpload uploadFile(MultipartFile[] files) {
         return new SpringMVCFileUpload(files);
     }
 
@@ -220,7 +218,7 @@ public final class FileUtils {
      * @param request HttpServletRequest
      * @return 返回 Servlet 文件上传对象
      */
-    public static ServletFileUpload uploadLocalFile(HttpServletRequest request) {
+    public static ServletFileUpload uploadFile(HttpServletRequest request) {
         return new ServletFileUpload(request);
     }
 
@@ -231,19 +229,17 @@ public final class FileUtils {
      * @return 返回本地文件对象
      */
     public static LocalFile createLocalFile(String extension) {
-        if (extension == null) {
-            extension = "";
-        } else {
-            extension = "." + extension;
-        }
-        String uuidStr = UUID.randomUUID().toString().replace("-", "");
-        String fileName = uuidStr + extension;
-        String childFolderName = fileName.substring(0, LocalFileUpload.getChildFolderLength());
-        File childFoloder = new File(LocalFileUpload.getStorageRootFolder() + "/" + childFolderName);
-        if (!childFoloder.exists()) {
-            childFoloder.mkdirs();
-        }
-        return new LocalFile(uuidStr, new File(childFoloder, fileName));
+        return LocalFile.create(extension);
+    }
+
+    /**
+     * 获取本地文件资源
+     *
+     * @param extension 文件扩展名, eg: 'jpg', 'png'...
+     * @return 返回本地文件对象
+     */
+    public static LocalFile getLocalFileSource(String extension) {
+        return LocalFile.getSource(extension);
     }
 
     /**
@@ -253,18 +249,7 @@ public final class FileUtils {
      * @return 返回 KEY 表示的本地文件
      */
     public static File getLocalFile(String fileKey) {
-        if (fileKey != null && fileKey.length() > LocalFileUpload.getChildFolderLength()) {
-            String childFolderName = fileKey.substring(0, LocalFileUpload.getChildFolderLength());
-            File childFoloder = new File(LocalFileUpload.getStorageRootFolder() + "/" + childFolderName);
-            if (childFoloder.isDirectory()) {
-                for (File file : childFoloder.listFiles()) {
-                    if (file.getName().equals(fileKey)) {
-                        return file;
-                    }
-                }
-            }
-        }
-        return null;
+        return LocalFile.get(fileKey);
     }
 
     /**
