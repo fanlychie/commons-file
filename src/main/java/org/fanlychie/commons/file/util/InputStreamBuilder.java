@@ -2,6 +2,10 @@ package org.fanlychie.commons.file.util;
 
 import org.fanlychie.commons.file.exception.RuntimeCastException;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * InputStream 构建器
@@ -104,8 +110,23 @@ public final class InputStreamBuilder {
     public static InputStream buildHpptUrlInputStream(String url, int readTimeout, int connectTimeout) {
         HttpURLConnection conn = null;
         try {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-        } catch (IOException e) {
+            URL source = new URL(url);
+            if (source.getProtocol().toLowerCase().equals("https")) {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {}
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {}
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                }}, null);
+                conn = (HttpsURLConnection) source.openConnection();
+                ((HttpsURLConnection) conn).setSSLSocketFactory(sslContext.getSocketFactory());
+            } else {
+                conn = (HttpURLConnection) source.openConnection();
+            }
+        } catch (Throwable e) {
             throw new RuntimeCastException(e);
         }
         conn.setReadTimeout(readTimeout);
