@@ -1,9 +1,6 @@
 package org.fanlychie.commons.file;
 
-import org.fanlychie.commons.file.util.FileUtils;
 import org.fanlychie.commons.file.util.InputStreamBuilder;
-
-import java.io.File;
 
 /**
  * Http URL 流
@@ -36,65 +33,6 @@ public class HttpURLStream {
     }
 
     /**
-     * 下载到目录
-     *
-     * @param dest 目录绝对路径的名称
-     */
-    public void toFolder(String dest) {
-        toFolder(new File(dest));
-    }
-
-    /**
-     * 下载到目录
-     *
-     * @param dest 目录
-     */
-    public void toFolder(File dest) {
-        toFolder(dest, FileUtils.getUrlFileName(url));
-    }
-
-    /**
-     * 下载到目录
-     *
-     * @param dest     目录绝对路径的名称
-     * @param fileName 文件名称
-     */
-    public void toFolder(String dest, String fileName) {
-        toFolder(new File(dest), fileName);
-    }
-
-    /**
-     * 下载到目录
-     *
-     * @param dest     目录
-     * @param fileName 文件名称
-     */
-    public void toFolder(File dest, String fileName) {
-        if (!dest.isDirectory()) {
-            throw new IllegalArgumentException(dest + " 不是一个有效的目录");
-        }
-        toFile(new File(dest, fileName));
-    }
-
-    /**
-     * 下载到文件
-     *
-     * @param dest 文件绝对路径的名称
-     */
-    public void toFile(String dest) {
-        toFile(new File(dest));
-    }
-
-    /**
-     * 下载到文件
-     *
-     * @param dest 文件
-     */
-    public void toFile(File dest) {
-        FileUtils.writeStream(InputStreamBuilder.buildHpptUrlInputStream(url, readTimeout, connectTimeout)).toFile(dest);
-    }
-
-    /**
      * 设置读取超时时间, 默认为 3分钟
      *
      * @param readTimeout 超时时间, 毫秒单位
@@ -114,6 +52,24 @@ public class HttpURLStream {
     public HttpURLStream setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
+    }
+
+    /**
+     * 转化为可读的流
+     *
+     * @return 返回可读的流对象
+     */
+    public ReadableStream turnToReadableStream() {
+        return new ReadableStream(InputStreamBuilder.buildHpptUrlInputStream(url, readTimeout, connectTimeout));
+    }
+
+    /**
+     * 转化为可写的流
+     *
+     * @return 返回可写的流对象
+     */
+    public WritableStream turnToWritableStream() {
+        return new WritableStream(InputStreamBuilder.buildHpptUrlInputStream(url, readTimeout, connectTimeout));
     }
 
 }
