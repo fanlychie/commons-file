@@ -3,6 +3,7 @@ package org.fanlychie.commons.file;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.fanlychie.commons.file.exception.RuntimeCastException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -16,6 +17,9 @@ import java.util.function.BiFunction;
  */
 public class ServletFileUpload extends LocalFileUploadSupport {
 
+    /**
+     * HttpServletRequest
+     */
     private HttpServletRequest request;
 
     /**
@@ -105,7 +109,7 @@ public class ServletFileUpload extends LocalFileUploadSupport {
                         try {
                             fileItem.write(localFile);
                         } catch (Exception e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeCastException(e);
                         }
                     });
                 });
