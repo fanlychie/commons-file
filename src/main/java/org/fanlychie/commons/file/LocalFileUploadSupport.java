@@ -14,29 +14,45 @@ import java.util.function.Consumer;
 
 /**
  * 本地文件上传支持
- * Created by 范忠云 on 2017/1/13.
+ * Created by fanlychie on 2017/1/13.
  */
 public abstract class LocalFileUploadSupport {
 
-    // 上传的文件最小大小
+    /**
+     * 上传的文件最小大小, 默认0, 表示不限制
+     */
     protected long minSize;
 
-    // 上传的文件最大大小
+    /**
+     * 上传的文件最大大小, 默认0, 表示不限制
+     */
     protected long maxSize;
 
-    // 允许上传的文件类型
+    /**
+     * 允许上传的文件类型
+     */
     protected List<String> allowedFileExtension;
 
-    // 上传的文件类型不支持的提示信息
+    /**
+     * 上传的文件类型不支持的提示信息
+     */
     protected String unsupportedFileExtensionMsg;
 
-    // 上传的文件大小超出限制的提示信息
+    /**
+     * 上传的文件大小超出限制的提示信息
+     */
     protected String unsupportedFileSizeMsg;
 
-    // 文件大小支持功能
+    /**
+     * 额外的文件大小支持功能, 当上传的文件大小超出限制时, 则使用此功能继续完成上传文件的作业.
+     * 若调用端没有提供此功能, 当上传的文件大小超出限制时, 则不上传此文件并反馈相应的提示信息.
+     */
     protected BiFunction<InputStream, File, Boolean> fileSizeSupportedFunction;
 
-    // 文件类型支持功能
+    /**
+     * 额外的文件类型支持功能, 当上传的文件是不支持的文件类型时, 则使用此功能继续完成上传文件的作业.
+     * 若调用端没有提供此功能, 当上传的文件是不支持的文件类型时, 则不上传此文件并反馈相应的提示信息.
+     */
     protected BiFunction<InputStream, File, Boolean> fileExtensionSupportedFunction;
 
     /**
