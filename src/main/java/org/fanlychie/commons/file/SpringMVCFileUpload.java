@@ -15,7 +15,9 @@ import java.util.function.BiFunction;
  */
 public class SpringMVCFileUpload extends LocalFileUploadSupport {
 
-    // SpringMVC 文件对象数组
+    /**
+     * SpringMVC 文件对象数组
+     */
     private MultipartFile[] files;
 
     /**
