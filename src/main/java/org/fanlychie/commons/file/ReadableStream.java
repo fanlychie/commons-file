@@ -18,10 +18,15 @@ import java.util.function.Consumer;
  */
 public class ReadableStream {
 
+    /**
+     * 输入源读取器
+     */
     private BufferedReader bufferedReader;
 
-    // 默认使用的字符集编码
-    public static final String CHARSET_UTF8 = "UTF-8";
+    /**
+     * 默认使用的字符集编码
+     */
+    private static final String CHARSET_UTF8 = "UTF-8";
 
     /**
      * 创建一个可读的流对象
