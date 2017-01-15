@@ -97,15 +97,6 @@ public class ReadableStream {
     /**
      * 读取全部内容
      *
-     * @param consumer 读取到的全部的文本内容
-     */
-    public void read(Consumer<String> consumer) {
-        consumer.accept(readAsString());
-    }
-
-    /**
-     * 读取全部内容
-     *
      * @return 返回读取到的全部的文本内容
      */
     public String readAsString() {
@@ -123,15 +114,6 @@ public class ReadableStream {
         List<String> records = new ArrayList<>();
         readLineByLine((line) -> records.add(line));
         return records;
-    }
-
-    /**
-     * 读取到字符串容器
-     *
-     * @param consumer 字符串列表对象
-     */
-    public void readAsListOfString(Consumer<List<String>> consumer) {
-        consumer.accept(readAsListOfString());
     }
 
     /**
