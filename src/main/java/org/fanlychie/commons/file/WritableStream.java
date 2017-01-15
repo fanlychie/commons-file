@@ -20,11 +20,19 @@ import java.io.OutputStreamWriter;
  */
 public class WritableStream {
 
+    /**
+     * 字符串内容
+     */
     private String content;
 
+    /**
+     * 源的输入流
+     */
     private BufferedInputStream bufferedInputStream;
 
-    // 512KB
+    /**
+     * IO 缓存, 512KB
+     */
     private static final byte[] BUFFER = new byte[512 * 1024];
 
     /**
