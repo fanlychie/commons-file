@@ -235,11 +235,11 @@ public final class FileUtils {
     /**
      * 获取本地文件资源
      *
-     * @param extension 文件扩展名, eg: 'jpg', 'png'...
+     * @param fileKey 文件存储 KEY
      * @return 返回本地文件对象
      */
-    public static LocalFile getLocalFileSource(String extension) {
-        return LocalFile.getSource(extension);
+    public static LocalFile getLocalFileSource(String fileKey) {
+        return LocalFile.getSource(fileKey);
     }
 
     /**
