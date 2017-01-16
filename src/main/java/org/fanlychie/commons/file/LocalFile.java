@@ -96,7 +96,7 @@ public class LocalFile {
      */
     public void output(HttpServletResponse response, String contentType) {
         if (file == null) {
-            throw new LocalFileNotFoundException("找不到文件: " + file);
+            throw new LocalFileNotFoundException("找不到 Key 表示的文件: " + key);
         }
         if (contentType == null) {
             contentType = getContentType(FileUtils.getFileExtension(file.getName()));
