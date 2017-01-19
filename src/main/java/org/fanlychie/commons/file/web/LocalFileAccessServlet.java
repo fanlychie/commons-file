@@ -3,6 +3,7 @@ package org.fanlychie.commons.file.web;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fanlychie.commons.file.FileUtils;
+import org.fanlychie.commons.file.exception.LocalFileNotFoundException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -43,6 +44,10 @@ public class LocalFileAccessServlet extends HttpServlet {
         } else {
             try {
                 FileUtils.accessLocalFile(response, fileKey);
+            } catch (LocalFileNotFoundException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("找不到 Key 表示的文件: " + fileKey);
+                }
             } catch (Throwable e) {
                 log.error("访问本地文件出错, 参数 " + fileKeyParameterName + ": " + fileKey, e);
             }
