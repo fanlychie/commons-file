@@ -76,7 +76,7 @@ public class LocalFileUploadServlet extends HttpServlet {
                     .upload();
             String reportJsonStr = JSON.toJSONString(report);
             if (log.isDebugEnabled()) {
-                log.debug(reportJsonStr);
+                log.debug("本地文件上传: " + reportJsonStr);
             }
             writeOut(response, reportJsonStr);
         } catch (Throwable e) {

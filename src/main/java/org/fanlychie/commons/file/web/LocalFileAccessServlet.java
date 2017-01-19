@@ -44,7 +44,7 @@ public class LocalFileAccessServlet extends HttpServlet {
             try {
                 FileUtils.accessLocalFile(response, fileKey);
             } catch (Throwable e) {
-                log.error("访问本地文件出错, " + fileKeyParameterName + ": " + fileKey, e);
+                log.error("访问本地文件出错, 参数 " + fileKeyParameterName + ": " + fileKey, e);
             }
         }
     }
