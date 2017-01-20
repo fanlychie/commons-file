@@ -43,11 +43,6 @@ public final class FileUtils {
      */
     private static final String CHARSET_UTF8 = "UTF-8";
 
-    /**
-     * IO 缓存, 512KB
-     */
-    private static final byte[] BUFFER = new byte[512 * 1024];
-
     // 文件大小单位
     private static final String[] FILE_SIZE_UNIT = {"B", "KB", "M", "G"};
 
@@ -680,12 +675,13 @@ public final class FileUtils {
      * @param inputStream  输入流
      * @param outputStream 输出流
      */
-    static void writeInputStreamToOutputStream(InputStream inputStream, OutputStream outputStream) {
+    static synchronized void writeInputStreamToOutputStream(InputStream inputStream, OutputStream outputStream) {
         try (BufferedInputStream bis = new BufferedInputStream(inputStream);
              BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
             int read;
-            while ((read = bis.read(BUFFER)) != -1) {
-                bos.write(BUFFER, 0, read);
+            byte[] buffer = new byte[512 * 1024];
+            while ((read = bis.read(buffer)) != -1) {
+                bos.write(buffer, 0, read);
             }
         } catch (IOException e) {
             throw new RuntimeCastException(e);
@@ -723,8 +719,9 @@ public final class FileUtils {
         try (BufferedInputStream bis = new BufferedInputStream(inputStream);
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             int read;
-            while ((read = bis.read(BUFFER)) != -1) {
-                baos.write(BUFFER, 0, read);
+            byte[] buffer = new byte[512 * 1024];
+            while ((read = bis.read(buffer)) != -1) {
+                baos.write(buffer, 0, read);
             }
             return dataUriScheme + new String(Base64.getEncoder().encode(baos.toByteArray()));
         } catch (IOException e) {
