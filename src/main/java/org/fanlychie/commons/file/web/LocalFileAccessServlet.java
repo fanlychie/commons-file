@@ -21,7 +21,7 @@ public class LocalFileAccessServlet extends HttpServlet {
     /**
      * 文件 Key 参数的名称
      */
-    private String fileKeyParameterName = "file";
+    private String fileKeyParameter = "file";
 
     /**
      * 日志
@@ -30,17 +30,17 @@ public class LocalFileAccessServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
-        String fileKeyParameterNameStr = config.getInitParameter("fileKeyParameterName");
-        if (fileKeyParameterNameStr != null) {
-            fileKeyParameterName = fileKeyParameterNameStr;
+        String fileKeyParameterStr = config.getInitParameter("fileKeyParameter");
+        if (fileKeyParameterStr != null) {
+            fileKeyParameter = fileKeyParameterStr;
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String fileKey = request.getParameter(fileKeyParameterName);
+        String fileKey = request.getParameter(fileKeyParameter);
         if (fileKey == null || fileKey.length() != 32) {
-            log.warn("访问本地文件的 " + fileKeyParameterName + " 参数不合法: " + fileKey);
+            log.warn("访问本地文件的 " + fileKeyParameter + " 参数值不合法: " + fileKey);
         } else {
             try {
                 FileUtils.accessLocalFile(response, fileKey);
@@ -49,7 +49,7 @@ public class LocalFileAccessServlet extends HttpServlet {
                     log.debug("找不到 Key 表示的文件: " + fileKey);
                 }
             } catch (Throwable e) {
-                log.error("访问本地文件出错, 参数 " + fileKeyParameterName + ": " + fileKey, e);
+                log.error("访问本地文件出错, 参数 " + fileKeyParameter + ": " + fileKey, e);
             }
         }
     }
