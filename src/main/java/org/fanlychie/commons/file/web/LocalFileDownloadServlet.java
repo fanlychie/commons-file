@@ -59,6 +59,11 @@ public class LocalFileDownloadServlet extends HttpServlet {
             String fileName = request.getParameter(fileNameParameter);
             if (fileName == null) {
                 fileName = file.getName();
+            } else {
+                String extension = FileUtils.getFileExtension(file);
+                if (!extension.isEmpty() && !fileName.endsWith(extension)) {
+                    fileName += "." + extension;
+                }
             }
             if (log.isDebugEnabled()) {
                 log.debug("下载本地文件, Key: " + fileKey);
