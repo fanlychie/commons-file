@@ -675,7 +675,7 @@ public final class FileUtils {
      * @param inputStream  输入流
      * @param outputStream 输出流
      */
-    static synchronized void writeInputStreamToOutputStream(InputStream inputStream, OutputStream outputStream) {
+    static void writeInputStreamToOutputStream(InputStream inputStream, OutputStream outputStream) {
         try (BufferedInputStream bis = new BufferedInputStream(inputStream);
              BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
             int read;
