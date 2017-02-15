@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,11 @@ public final class FileUtils {
      */
     private static final Map<String, String> DATA_URI_SCHEME_EXTENSION = new HashMap<>();
 
+    /**
+     * mime types
+     */
+    private static final Map<String, String> MIME_TYPES = new HashMap<>();
+
     // 私有
     private FileUtils() {
 
@@ -77,6 +83,14 @@ public final class FileUtils {
         EXTENSION_DATA_URI_SCHEME.put("ico", "data:image/x-icon;base64,");
         // 反转
         EXTENSION_DATA_URI_SCHEME.forEach((k, v) -> DATA_URI_SCHEME_EXTENSION.put(v, k));
+        // mime types
+        readStreamLineByLine(FileUtils.class.getClassLoader().getResourceAsStream("mime.types"), line -> {
+            String[] data = line.split(";");
+            String mimeType = data[0].trim();
+            Arrays.stream(data[1].trim().split(" ")).forEach(s -> {
+                MIME_TYPES.put(s, mimeType);
+            });
+        });
     }
 
     /**
@@ -232,6 +246,7 @@ public final class FileUtils {
     public static void provideFileDownload(HttpServletResponse response, File file, String fileName) {
         try {
             fileName = new String(fileName.getBytes(CHARSET_UTF8), "ISO-8859-1");
+            response.setContentLength((int) file.length());
             response.setContentType("application/octet-stream; charset=iso-8859-1");
             response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
             writeInputStreamToOutputStream(getInputStream(file), response.getOutputStream());
@@ -459,7 +474,8 @@ public final class FileUtils {
         if (file == null) {
             throw new LocalFileNotFoundException("找不到 Key 表示的文件: " + fileKey);
         }
-        response.setContentType(getContentType(getFileExtension(file)));
+        response.setContentLength((int) file.length());
+        response.setContentType(MIME_TYPES.getOrDefault(getFileExtension(file), "application/octet-stream"));
         try {
             writeInputStreamToOutputStream(getInputStream(file), response.getOutputStream());
         } catch (IOException e) {
@@ -684,7 +700,10 @@ public final class FileUtils {
                 bos.write(buffer, 0, read);
             }
         } catch (IOException e) {
-            throw new RuntimeCastException(e);
+            // 隐藏客户端强制退出时抛出的异常
+            if (!e.getClass().getSimpleName().equals("ClientAbortException")) {
+                throw new RuntimeCastException(e);
+            }
         }
     }
 
@@ -750,91 +769,6 @@ public final class FileUtils {
             return childFoloder;
         }
         return null;
-    }
-
-    /**
-     * 获取文件 content-type
-     *
-     * @param extension 文件扩展名
-     * @return 返回 content-type 字符串
-     */
-    private static String getContentType(String extension) {
-        switch (extension) {
-            case "doc":
-                return "application/msword";
-            case "docx":
-                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            case "rtf":
-                return "application/rtf";
-            case "xls":
-                return "application/vnd.ms-excel";
-            case "xlsx":
-                return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            case "ppt":
-                return "application/vnd.ms-powerpoint";
-            case "pptx":
-                return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-            case "pdf":
-                return "application/pdf";
-            case "swf":
-                return "application/x-shockwave-flash";
-            case "dll":
-                return "application/x-msdownload";
-            case "exe":
-            case "msi":
-            case "chm":
-            case "rar":
-                return "application/octet-stream";
-            case "tar":
-                return "application/x-tar";
-            case "zip":
-                return "application/x-zip-compressed";
-            case "z":
-            case "tgz":
-                return "application/x-compressed";
-            case "wav":
-                return "audio/wav";
-            case "wma":
-                return "audio/x-ms-wma";
-            case "wmv":
-                return "video/x-ms-wmv";
-            case "mp2":
-            case "mp3":
-            case "mpe":
-            case "mpg":
-            case "mpeg":
-                return "audio/mpeg";
-            case "bmp":
-                return "image/bmp";
-            case "gif":
-                return "image/gif";
-            case "png":
-                return "image/png";
-            case "tif":
-            case "tiff":
-                return "image/tiff";
-            case "jpe":
-            case "jpg":
-            case "jpeg":
-                return "image/jpeg";
-            case "ico":
-                return "image/x-icon";
-            case "txt":
-                return "text/plain";
-            case "xml":
-                return "text/xml";
-            case "html":
-                return "text/html";
-            case "css":
-                return "text/css";
-            case "js":
-                return "text/javascript";
-            case "mht":
-            case "mhtml":
-                return "message/rfc822";
-            default:
-                return "";
-        }
     }
 
 }
