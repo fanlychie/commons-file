@@ -3,6 +3,7 @@ package org.fanlychie.commons.file.web;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fanlychie.commons.file.FileUtils;
+import org.fanlychie.commons.file.LocalFileUploadConfig;
 import org.fanlychie.commons.file.exception.LocalFileNotFoundException;
 
 import javax.servlet.ServletConfig;
@@ -49,7 +50,7 @@ public class LocalFileDownloadServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String fileKey = request.getParameter(fileKeyParameter);
-        if (fileKey == null || fileKey.length() != 32) {
+        if (fileKey == null || fileKey.length() < LocalFileUploadConfig.getChildFolderLength()) {
             throw new IllegalArgumentException("下载本地文件的 " + fileKeyParameter + " 参数值不合法: " + fileKey);
         } else {
             File file = FileUtils.getLocalFile(fileKey);
