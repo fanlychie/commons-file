@@ -2,6 +2,7 @@ package org.fanlychie.commons.file;
 
 import org.fanlychie.commons.file.exception.Base64DecodeImageException;
 import org.fanlychie.commons.file.exception.Base64EncodeImageException;
+import org.fanlychie.commons.file.exception.LocalFileCreateException;
 import org.fanlychie.commons.file.exception.LocalFileNotFoundException;
 import org.fanlychie.commons.file.exception.RuntimeCastException;
 import org.springframework.web.multipart.MultipartFile;
@@ -431,18 +432,52 @@ public final class FileUtils {
     }
 
     /**
+     * 创建一个没有扩展名的本地文件
+     *
+     * @return 返回本地文件对象
+     */
+    public static LocalFile createLocalFile() {
+        return createLocalFile(null);
+    }
+
+    /**
      * 创建本地文件
      *
      * @param extension 文件扩展名, eg: 'jpg', 'png'...
      * @return 返回本地文件对象
      */
     public static LocalFile createLocalFile(String extension) {
-        if (extension == null) {
-            throw new NullPointerException();
+        String fileKey = null;
+        do {
+            fileKey = UUID.randomUUID().toString().replace("-", "");
+        } while (getLocalFile(fileKey) != null);
+        if (extension != null && !extension.isEmpty()) {
+            fileKey += "." + extension;
         }
-        String uuidStr = UUID.randomUUID().toString().replace("-", "");
-        String fileName = uuidStr + "." + extension;
-        return new LocalFile(uuidStr, new File(getLocalFileChildFolder(uuidStr, true), fileName));
+        return newLocalFile(fileKey);
+    }
+
+    /**
+     * 新建本地文件
+     *
+     * @param fileName 本地文件名称, 除扩展名外文件名有效长度必须不小于 {@link LocalFileUploadConfig#childFolderLength}
+     * @return 返回本地文件对象
+     */
+    public static LocalFile newLocalFile(String fileName) {
+        File localFileFoloder = getLocalFileFolder(fileName);
+        if (!localFileFoloder.exists()) {
+            localFileFoloder.mkdirs();
+        }
+        File localFile = new File(localFileFoloder, fileName);
+        if (localFile.exists()) {
+            throw new LocalFileCreateException("文件已经存在: " + fileName);
+        }
+        try {
+            localFile.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeCastException(e);
+        }
+        return new LocalFile(fileName, localFile);
     }
 
     /**
@@ -452,12 +487,11 @@ public final class FileUtils {
      * @return 返回 KEY 表示的本地文件
      */
     public static File getLocalFile(String fileKey) {
-        File childFoloder = getLocalFileChildFolder(fileKey, false);
-        if (childFoloder != null) {
-            for (File file : childFoloder.listFiles()) {
-                if (file.getName().startsWith(fileKey)) {
-                    return file;
-                }
+        File localFileFoloder = getLocalFileFolder(fileKey);
+        if (localFileFoloder != null && localFileFoloder.isDirectory()) {
+            File localFile = new File(localFileFoloder, fileKey);
+            if (localFile.isFile()) {
+                return localFile;
             }
         }
         return null;
@@ -749,26 +783,17 @@ public final class FileUtils {
     }
 
     /**
-     * 获取本地文件的子文件夹目录
+     * 获取本地文件所在的目录
      *
      * @param fileKey 表示本地文件的 Key
-     * @param create  目录不存在时是否创建
-     * @return 返回子文件夹目录
+     * @return 返回本地文件所在的目录
      */
-    private static File getLocalFileChildFolder(String fileKey, boolean create) {
-        if (fileKey != null && fileKey.length() > LocalFileUploadConfig.childFolderLength) {
-            String childFolderName = fileKey.substring(0, LocalFileUploadConfig.childFolderLength);
-            File childFoloder = new File(LocalFileUploadConfig.storageRootFolder, childFolderName);
-            if (!childFoloder.exists()) {
-                if (create) {
-                    childFoloder.mkdirs();
-                } else {
-                    return null;
-                }
-            }
-            return childFoloder;
+    private static File getLocalFileFolder(String fileKey) {
+        if (fileKey == null && fileKey.length() < LocalFileUploadConfig.childFolderLength) {
+            return null;
         }
-        return null;
+        String localFileChildFolderName = fileKey.substring(0, LocalFileUploadConfig.childFolderLength);
+        return new File(LocalFileUploadConfig.storageRootFolder, localFileChildFolderName);
     }
 
 }
