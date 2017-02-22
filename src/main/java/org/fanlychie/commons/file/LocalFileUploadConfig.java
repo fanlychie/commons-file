@@ -1,7 +1,7 @@
 package org.fanlychie.commons.file;
 
 /**
- * 本地文件上传配置
+ * 本地文件上传全局配置
  * Created by fanlychie on 2017/1/13.
  */
 public class LocalFileUploadConfig {
@@ -32,6 +32,24 @@ public class LocalFileUploadConfig {
      */
     public void setChildFolderLength(int childFolderLength) {
         LocalFileUploadConfig.childFolderLength = childFolderLength;
+    }
+
+    /**
+     * 获取本地上传的文件存储的子目录长度
+     *
+     * @return 返回本地上传的文件存储的子目录长度
+     */
+    public static int getChildFolderLength() {
+        return childFolderLength;
+    }
+
+    /**
+     * 获取本地上传的文件存储根目录
+     *
+     * @return 返回本地上传的文件存储根目录
+     */
+    public static String getStorageRootFolder() {
+        return storageRootFolder;
     }
 
 }
